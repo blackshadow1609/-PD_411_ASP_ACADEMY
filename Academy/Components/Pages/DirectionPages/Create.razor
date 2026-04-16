@@ -3,6 +3,7 @@
 @using Academy.Models
 @inject IDbContextFactory<Academy.Data.AcademyContext> DbFactory
 @inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
 <PageTitle>Create</PageTitle>
 
@@ -20,6 +21,7 @@
                 <InputNumber id="direction_id" @bind-Value="ID" class="form-control" />
                 <ValidationMessage For="() => Direction.direction_id" class="text-danger" />
             </div>
+
             <div class="mb-3">
                 <label for="direction_name" class="form-label">direction_name:</label>
                 <InputText id="direction_name" @bind-Value="Direction.direction_name" class="form-control" />
