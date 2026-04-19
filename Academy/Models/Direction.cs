@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Academy.Models.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
+
 //using System.ComponentModel.DataAnnotations.Schema;
 
 
@@ -12,6 +14,7 @@ namespace Academy.Models
         //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public byte direction_id { get; set; }
         [Required]
+        [UniqueDirectionName(ErrorMessage = "Error!!!")]
         public string? direction_name { get; set; }
         //public override bool Equals(object? other)
         //{
