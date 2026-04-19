@@ -40,8 +40,7 @@
 @code {
     [SupplyParameterFromForm]
     private Direction Direction { get; set; } = new();
-    // private Direction Direction { get; set; } = default!;
-    // protected override void OnInitialized() => Direction ??= new();
+    
     protected override void OnInitialized()
     {
         using (Academy.Data.AcademyContext context = DbFactory.CreateDbContext())
