@@ -16,19 +16,19 @@ namespace Academy.Data
 
         public DbSet<Academy.Models.Direction> Directions { get; set; } = default!;
         public DbSet<Academy.Models.Group> Groups { get; set; } = default!;
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Group>()
-                .HasOne(g => g.Direction)
-                .WithMany(d => d.Groups)
-                .HasForeignKey(g => g.direction)
-                .IsRequired();
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<Group>()
+        //        .HasOne(g => g.Direction)
+        //        .WithMany(d => d.Groups)
+        //        .HasForeignKey(g => g.direction)
+        //        .IsRequired();
 
-            modelBuilder.Entity<Direction>()
-                .HasMany(d => d.Groups)
-                .WithOne(g => g.Direction)
-                .HasForeignKey(g => g.direction)
-                .IsRequired();
-        }
+        //    modelBuilder.Entity<Direction>()
+        //        .HasMany(d => d.Groups)
+        //        .WithOne(g => g.Direction)
+        //        .HasForeignKey(g => g.direction)
+        //        .IsRequired();
+        //}
     }
 }

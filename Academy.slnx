@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="Academy/Academy.csproj" />
+  <Project Path="Academy2/Academy2.csproj" Id="0865b642-2e63-4676-9b90-984680a0fd91" />
 </Solution>
