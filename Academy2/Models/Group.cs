@@ -23,5 +23,6 @@ namespace Academy2.Models
         //Nav.properties
         //[Required]
         public Direction? Direction { get; set; }
+        public ICollection<Student> Students { get; set; } = default!;
     }
 }
