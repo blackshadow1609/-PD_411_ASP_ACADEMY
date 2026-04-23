@@ -9,6 +9,7 @@ namespace Academy2.Models
         [Column(TypeName="smallint")]
         public int teacher_id { get; set; }
         public DateOnly work_since { get; set; } = default!;
+        [Column(TypeName = "smallmoney")]
         public decimal rate { get; set; }
     }
 }

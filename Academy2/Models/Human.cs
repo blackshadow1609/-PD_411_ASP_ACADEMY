@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
-//using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace Academy2.Models
 {
     public class Human
     {
-       
-        public int stud_id { get; set; }
-        [Required] 
+        //public int id { get; set; }
+        [Required]
         public string? last_name { get; set; }
         [Required]
         public string? first_name { get; set; }
@@ -19,7 +18,7 @@ namespace Academy2.Models
         public string? email { get; set; }
         public string? phone { get; set; }
         public byte[]? photo { get; set; }
-       
+
 
     }
 }

@@ -6,6 +6,7 @@ namespace Academy2.Models
     public class Student:Human
     {
         [Key]
+        public int stud_id { get; set; }
         [Required]
         [ForeignKey(nameof(Group))]
         public int group { get; set; }
