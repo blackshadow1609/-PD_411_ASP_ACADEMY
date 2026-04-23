@@ -19,18 +19,14 @@ else
 {
     <div class="row">
         <div>
-            <EditForm method="post" Model="Teacher" OnValidSubmit="UpdateTeacher" FormName="edit" Enhance>
+            <EditForm method="post" Model="Teacher" OnValidSubmit="UpdateTeacher" FormName="edit" Enhance class="edit-form">
+              
                 <DataAnnotationsValidator />
                 <ValidationSummary role="alert" />
                 <div class="human-container">
                     <div class="col-md-4">
                         <input type="hidden" name="Teacher.teacher_id" value="@Teacher.teacher_id" />
 
-                        @* <div class="mb-3">
-                            <label for="teacher_id" class="form-label">teacher_id:</label>
-                            <InputNumber id="teacher_id" @bind-Value="Teacher.teacher_id" class="form-control" />
-                            <ValidationMessage For="() => Teacher.teacher_id" class="text-danger" />
-                        </div> *@
                         <div class="mb-3">
                             <span class="text-danger">*</span>
                             <label for="last_name" class="form-label">last_name:</label>
@@ -64,11 +60,6 @@ else
                             <InputText id="phone" @bind-Value="Teacher.phone" class="form-control" />
                             <ValidationMessage For="() => Teacher.phone" class="text-danger" />
                         </div>
-                        @* <div class="mb-3">
-                        <label for="photo" class="form-label">photo:</label>
-                        <InputText id="photo" @bind-Value="Teacher.photo" class="form-control" />
-                        <ValidationMessage For="() => Teacher.photo" class="text-danger" />
-                        </div> *@
                         <div class="mb-3">
                             <label for="work_since" class="form-label">work_since:</label>
                             <InputDate id="work_since" @bind-Value="Teacher.work_since" class="form-control" />
@@ -82,9 +73,8 @@ else
                     </div>
                     <div class="photo-container">
                         <Photo url="@url" />
-                        @url
-                        <InputFile OnChange="e => LoadPhoto(e)" />
-                        @* <input type="file" @bind="url"/> *@
+                        
+                        <InputFile OnChange="LoadPhoto" /> 
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
@@ -97,22 +87,55 @@ else
     <a href="/teachers">Back to List</a>
 </div>
 
+<style>
+    .edit-form { 
+        width: 100%;
+    }
+    
+    .human-container {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .photo-container {
+        width: 40%;
+    }
+</style>
+
 @code {
     [SupplyParameterFromQuery]
     private int teacher_id { get; set; }
 
     [SupplyParameterFromForm]
     private Teacher? Teacher { get; set; }
+    
     string? url { get; set; }
-    void LoadPhoto(ChangeEventArgs e)
+    
+    
+    async Task LoadPhoto(InputFileChangeEventArgs e)
     {
-        
+        var file = e.File;
+        if (file != null)
+        {
+            using var stream = file.OpenReadStream(maxAllowedSize: 512000); 
+            var bytes = new byte[stream.Length];
+            await stream.ReadAsync(bytes);
+            url = $"data:image/jpeg;base64,{Convert.ToBase64String(bytes)}";
+            Teacher!.photo = bytes;
+        }
     }
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
         Teacher ??= await context.Teachers.FirstOrDefaultAsync(m => m.teacher_id == teacher_id);
+        
+        
+        if (Teacher?.photo != null)
+        {
+            url = $"data:image/jpeg;base64,{Convert.ToBase64String(Teacher.photo)}";
+        }
 
         if (Teacher is null)
         {
@@ -120,8 +143,6 @@ else
         }
     }
 
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateTeacher()
     {
         using var context = DbFactory.CreateDbContext();

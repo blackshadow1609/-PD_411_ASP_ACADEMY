@@ -1,8 +1,24 @@
 ﻿<h3>Photo</h3>
 
-<img src="@url" alt="Photo" />
+@if (!string.IsNullOrEmpty(url))
+{
+    <img src="@url" alt="Photo" />
+}
+else
+{
+    <p>No photo uploaded</p>
+}
 
 @code {
     [Parameter]
     public string? url { get; set; }
 }
+
+<style>
+    img {
+        width: 300px;
+        height: 400px;
+        border: solid 1px;
+        object-fit: cover;
+    }
+</style>
