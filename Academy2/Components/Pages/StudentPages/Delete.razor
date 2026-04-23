@@ -1,6 +1,7 @@
 ﻿@page "/students/delete"
 @using Microsoft.EntityFrameworkCore
 @using Academy2.Models
+@using System
 @inject IDbContextFactory<Academy2.Data.Academy2Context> DbFactory
 @inject NavigationManager NavigationManager
 
@@ -16,39 +17,55 @@
     {
         <p><em>Loading...</em></p>
     }
-    else {
-        <dl class="row">
-            <dt class="col-sm-2">last_name</dt>
-            <dd class="col-sm-10">@student.last_name</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">first_name</dt>
-            <dd class="col-sm-10">@student.first_name</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">middle_name</dt>
-            <dd class="col-sm-10">@student.middle_name</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">birth_date</dt>
-            <dd class="col-sm-10">@student.birth_date</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">email</dt>
-            <dd class="col-sm-10">@student.email</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">phone</dt>
-            <dd class="col-sm-10">@student.phone</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">photo</dt>
-            <dd class="col-sm-10">@student.photo</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">group</dt>
-            <dd class="col-sm-10">@student.group</dd>
-        </dl>
+    else
+    {
+        <div class="custom-details-container">
+            <div class="custom-details-info">
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">stud_id:</span>
+                    <span class="custom-detail-value">@student.stud_id</span>
+                </div>
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">last_name:</span>
+                    <span class="custom-detail-value">@student.last_name</span>
+                </div>
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">first_name:</span>
+                    <span class="custom-detail-value">@student.first_name</span>
+                </div>
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">middle_name:</span>
+                    <span class="custom-detail-value">@student.middle_name</span>
+                </div>
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">birth_date:</span>
+                    <span class="custom-detail-value">@student.birth_date</span>
+                </div>
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">email:</span>
+                    <span class="custom-detail-value">@student.email</span>
+                </div>
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">phone:</span>
+                    <span class="custom-detail-value">@student.phone</span>
+                </div>
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">group:</span>
+                    <span class="custom-detail-value">@student.group</span>
+                </div>
+            </div>
+            <div class="custom-details-photo">
+                <h3>Photo</h3>
+                @if (student.photo != null && student.photo.Length > 0)
+                {
+                    <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(student.photo)}")" class="custom-photo-preview" />
+                }
+                else
+                {
+                    <div class="custom-photo-placeholder">No photo</div>
+                }
+            </div>
+        </div>
         <EditForm method="post" Model="student" OnValidSubmit="DeleteStudent" FormName="delete" Enhance>
             <button type="submit" class="btn btn-danger" disabled="@(student is null)">Delete</button> |
             <a href="/students">Back to List</a>
