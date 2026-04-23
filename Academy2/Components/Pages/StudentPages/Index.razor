@@ -6,38 +6,44 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<Academy2.Data.Academy2Context> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Students</PageTitle>
 
-<h1>Количество студентов: @context.Students.Count()</h1>
+<h1>Index</h1>
 
 <p>
     <a href="students/create">Create New</a>
 </p>
 
 <QuickGrid Class="table" Items="Students">
+    <PropertyColumn Property="student => student.stud_id" />
     <PropertyColumn Property="student => student.last_name" />
     <PropertyColumn Property="student => student.first_name" />
     <PropertyColumn Property="student => student.middle_name" />
     <PropertyColumn Property="student => student.birth_date" />
-    @* <PropertyColumn Property="student => student.email" />
+    <PropertyColumn Property="student => student.email" />
     <PropertyColumn Property="student => student.phone" />
-    <PropertyColumn Property="student => student.photo" /> *@
     <PropertyColumn Property="student => student.Group.group_name" />
 
     <TemplateColumn Context="student">
-        <a href="@($"students/details?stud_id={student.stud_id}")">Details</a>
+        <a href="@($"students/details?stud_id={student.stud_id}")">Details</a> |
+        <a href="@($"students/edit?stud_id={student.stud_id}")">Edit</a> |
+        <a href="@($"students/delete?stud_id={student.stud_id}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>
 
 @code {
     private Academy2Context context = default!;
-    IQueryable<Student> Students = default!;
+    private IQueryable<Student> Students = default!;
 
     protected override void OnInitialized()
     {
         context = DbFactory.CreateDbContext();
-        Students = context.Students.Include(s => s.Group);
+        Students = context.Students.Include(s => s.Group).AsQueryable();
     }
 
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+    public async ValueTask DisposeAsync()
+    {
+        if (context != null)
+            await context.DisposeAsync();
+    }
 }
