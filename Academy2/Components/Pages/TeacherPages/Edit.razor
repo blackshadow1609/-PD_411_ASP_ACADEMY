@@ -1,6 +1,7 @@
 ﻿@page "/teachers/edit"
 @using Microsoft.EntityFrameworkCore
 @using Academy2.Models
+@using System
 @inject IDbContextFactory<Academy2.Data.Academy2Context> DbFactory
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
@@ -19,11 +20,10 @@ else
 {
     <div class="row">
         <div>
-            <EditForm method="post" Model="Teacher" OnValidSubmit="UpdateTeacher" FormName="edit" Enhance class="edit-form">
-              
+            <EditForm method="post" Model="Teacher" OnValidSubmit="UpdateTeacher" FormName="edit" Enhance class="custom-edit-form">
                 <DataAnnotationsValidator />
                 <ValidationSummary role="alert" />
-                <div class="human-container">
+                <div class="custom-human-container">
                     <div class="col-md-4">
                         <input type="hidden" name="Teacher.teacher_id" value="@Teacher.teacher_id" />
 
@@ -71,10 +71,9 @@ else
                             <ValidationMessage For="() => Teacher.rate" class="text-danger" />
                         </div>
                     </div>
-                    <div class="photo-container">
+                    <div class="custom-photo-container">
                         <Photo url="@url" />
-                        
-                        <InputFile OnChange="LoadPhoto" /> 
+                        <InputFile OnChange="LoadPhoto" />
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
@@ -87,23 +86,8 @@ else
     <a href="/teachers">Back to List</a>
 </div>
 
-<style>
-    .edit-form { 
-        width: 100%;
-    }
-    
-    .human-container {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-    }
-    
-    .photo-container {
-        width: 40%;
-    }
-</style>
-
 @code {
+    
     [SupplyParameterFromQuery]
     private int teacher_id { get; set; }
 
@@ -112,13 +96,12 @@ else
     
     string? url { get; set; }
     
-    
     async Task LoadPhoto(InputFileChangeEventArgs e)
     {
         var file = e.File;
         if (file != null)
         {
-            using var stream = file.OpenReadStream(maxAllowedSize: 512000); 
+            using var stream = file.OpenReadStream(maxAllowedSize: 5_000_000);
             var bytes = new byte[stream.Length];
             await stream.ReadAsync(bytes);
             url = $"data:image/jpeg;base64,{Convert.ToBase64String(bytes)}";
@@ -131,8 +114,7 @@ else
         using var context = DbFactory.CreateDbContext();
         Teacher ??= await context.Teachers.FirstOrDefaultAsync(m => m.teacher_id == teacher_id);
         
-        
-        if (Teacher?.photo != null)
+        if (Teacher?.photo != null && Teacher.photo.Length > 0)
         {
             url = $"data:image/jpeg;base64,{Convert.ToBase64String(Teacher.photo)}";
         }

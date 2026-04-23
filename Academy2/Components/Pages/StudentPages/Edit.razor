@@ -1,10 +1,10 @@
 ﻿@page "/students/edit"
 @using Microsoft.EntityFrameworkCore
 @using Academy2.Models
-@using System  // ДОБАВИТЬ
+@using System
 @inject IDbContextFactory<Academy2.Data.Academy2Context> DbFactory
 @inject NavigationManager NavigationManager
-@rendermode InteractiveServer  
+@rendermode InteractiveServer
 
 <PageTitle>Edit</PageTitle>
 
@@ -20,13 +20,13 @@ else
 {
     <div class="row">
         <div>
-            <EditForm method="post" Model="Student" OnValidSubmit="UpdateStudent" FormName="edit" Enhance class="edit-form">
+            <EditForm method="post" Model="Student" OnValidSubmit="UpdateStudent" FormName="edit" Enhance class="custom-edit-form">
                 <DataAnnotationsValidator />
                 <ValidationSummary role="alert" />
-                <div class="human-container">
+                <div class="custom-human-container">
                     <div class="col-md-4">
                         <input type="hidden" name="Student.stud_id" value="@Student.stud_id" />
-                        
+
                         <div class="mb-3">
                             <span class="text-danger">*</span>
                             <label for="last_name" class="form-label">last_name:</label>
@@ -74,7 +74,7 @@ else
                             <ValidationMessage For="() => Student.group" class="text-danger" />
                         </div>
                     </div>
-                    <div class="photo-container">
+                    <div class="custom-photo-container">
                         <Photo url="@url" />
                         <InputFile OnChange="LoadPhoto" />
                     </div>
@@ -88,22 +88,6 @@ else
 <div>
     <a href="/students">Back to List</a>
 </div>
-
-<style>
-    .edit-form { 
-        width: 100%;
-    }
-    
-    .human-container {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-    }
-    
-    .photo-container {
-        width: 40%;
-    }
-</style>
 
 @code {
     [SupplyParameterFromQuery]
@@ -130,7 +114,9 @@ else
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        Student ??= await context.Students.FirstOrDefaultAsync(m => m.stud_id == stud_id);
+        Student ??= await context.Students
+            .Include(s => s.Group)
+            .FirstOrDefaultAsync(m => m.stud_id == stud_id);
         
         if (Student?.photo != null && Student.photo.Length > 0)
         {

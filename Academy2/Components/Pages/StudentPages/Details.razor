@@ -18,52 +18,54 @@
     }
     else
     {
-        <dl class="row">
-            <dt class="col-sm-2">stud_id</dt>
-            <dd class="col-sm-10">@student.stud_id</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">last_name</dt>
-            <dd class="col-sm-10">@student.last_name</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">first_name</dt>
-            <dd class="col-sm-10">@student.first_name</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">middle_name</dt>
-            <dd class="col-sm-10">@student.middle_name</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">birth_date</dt>
-            <dd class="col-sm-10">@student.birth_date</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">email</dt>
-            <dd class="col-sm-10">@student.email</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">phone</dt>
-            <dd class="col-sm-10">@student.phone</dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">photo</dt>
-            <dd class="col-sm-10">
+        <div class="custom-details-container custom-animated">
+            <div class="custom-details-info">
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">stud_id:</span>
+                    <span class="custom-detail-value">@student.stud_id</span>
+                </div>
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">last_name:</span>
+                    <span class="custom-detail-value">@student.last_name</span>
+                </div>
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">first_name:</span>
+                    <span class="custom-detail-value">@student.first_name</span>
+                </div>
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">middle_name:</span>
+                    <span class="custom-detail-value">@student.middle_name</span>
+                </div>
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">birth_date:</span>
+                    <span class="custom-detail-value">@student.birth_date</span>
+                </div>
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">email:</span>
+                    <span class="custom-detail-value">@student.email</span>
+                </div>
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">phone:</span>
+                    <span class="custom-detail-value">@student.phone</span>
+                </div>
+                <div class="custom-detail-row">
+                    <span class="custom-detail-label">group:</span>
+                    <span class="custom-detail-value">@student.Group?.group_name</span>
+                </div>
+            </div>
+            <div class="custom-details-photo">
+                <h3>Photo</h3>
                 @if (student.photo != null && student.photo.Length > 0)
                 {
-                    <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(student.photo)}")" style="max-width: 300px; max-height: 400px; object-fit: cover;" />
+                    <img src="@($"data:image/jpeg;base64,{Convert.ToBase64String(student.photo)}")" class="custom-photo-preview" />
                 }
                 else
                 {
-                    <span>No photo</span>
+                    <div class="custom-photo-placeholder">No photo</div>
                 }
-            </dd>
-        </dl>
-        <dl class="row">
-            <dt class="col-sm-2">group</dt>
-            <dd class="col-sm-10">@student.Group?.group_name</dd>
-        </dl>
-        <div>
+            </div>
+        </div>
+        <div class="mt-3">
             <a href="@($"/students/edit?stud_id={student.stud_id}")">Edit</a> |
             <a href="/students">Back to List</a>
         </div>
