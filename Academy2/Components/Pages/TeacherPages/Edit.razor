@@ -75,6 +75,12 @@ else
                         <Photo url="@url" />
                         <InputFile OnChange="LoadPhoto" />
                     </div>
+                    <InputSelect @bind-Value="discipline">
+                        @foreach(Discipline d in Disciplines)
+                        {
+                            <option value="@d.discipline_id">@d.discipline_name</option>
+                        }
+                    </InputSelect>
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
@@ -87,15 +93,21 @@ else
 </div>
 
 @code {
-    
+
     [SupplyParameterFromQuery]
     private int teacher_id { get; set; }
 
     [SupplyParameterFromForm]
     private Teacher? Teacher { get; set; }
-    
+
+    DbSet<Discipline>? Disciplines { get; set; }
+    DbSet<TeacherDisciplineRelation>? TDR { get; set; }
+
+    int discipline;
+
+
     string? url { get; set; }
-    
+
     async Task LoadPhoto(InputFileChangeEventArgs e)
     {
         var file = e.File;
@@ -111,9 +123,14 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+
         using var context = DbFactory.CreateDbContext();
         Teacher ??= await context.Teachers.FirstOrDefaultAsync(m => m.teacher_id == teacher_id);
-        
+
+
+        Disciplines = context.Disciplines;
+        TDR = context.TeachersDisciplinesRelation;
+
         if (Teacher?.photo != null && Teacher.photo.Length > 0)
         {
             url = $"data:image/jpeg;base64,{Convert.ToBase64String(Teacher.photo)}";
@@ -127,6 +144,7 @@ else
 
     private async Task UpdateTeacher()
     {
+       
         using var context = DbFactory.CreateDbContext();
         context.Attach(Teacher!).State = EntityState.Modified;
 
@@ -151,6 +169,7 @@ else
 
     private bool TeacherExists(int teacher_id)
     {
+        
         using var context = DbFactory.CreateDbContext();
         return context.Teachers.Any(e => e.teacher_id == teacher_id);
     }
