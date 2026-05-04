@@ -110,7 +110,7 @@ else
 
     async Task LoadPhoto(InputFileChangeEventArgs e)
     {
-        var file = e.File;
+        var file = e.File; 
         if (file != null)
         {
             using var stream = file.OpenReadStream(maxAllowedSize: 5_000_000);
