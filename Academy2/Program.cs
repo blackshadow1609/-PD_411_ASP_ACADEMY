@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Academy2.Data;
+using Microsoft.AspNetCore.Builder;  // для UseMigrationsEndPoint
+
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContextFactory<Academy2Context>(options =>

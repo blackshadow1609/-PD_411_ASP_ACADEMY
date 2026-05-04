@@ -11,5 +11,8 @@ namespace Academy2.Models
         public DateOnly? work_since { get; set; } 
         [Column(TypeName = "smallmoney")]
         public decimal rate { get; set; }
+
+        //Nav.properties
+        ICollection<TeacherDisciplineRelation> DisciplinesRelations { get; set; } = default!;
     }
 }
