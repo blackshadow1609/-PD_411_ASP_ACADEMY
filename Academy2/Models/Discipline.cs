@@ -6,20 +6,18 @@ namespace Academy2.Models
     public class Discipline
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]  // Важно!
-        [Column(TypeName = "SMALLINT")]
+        [Column(TypeName = "smallint")]
         public int discipline_id { get; set; }
 
         [Required]
-        [StringLength(150)]
-        public string discipline_name { get; set; } = string.Empty;  // Убрал ? и добавил инициализацию
+        public string? discipline_name { get; set; }
 
         [Required]
-        [Column(TypeName = "TINYINT")]
-        [Range(1, 255)]
+        [Column(TypeName = "tinyint")]
         public int number_of_lessons { get; set; }
 
         // Navigation property
-        public virtual ICollection<TeacherDisciplineRelation> TeachersRelations { get; set; } = new List<TeacherDisciplineRelation>();
+        public ICollection<TeacherDisciplineRelation> TeachersRelations { get; set; } = default!;
+        
     }
 }

@@ -6,21 +6,22 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<Academy2.Data.Academy2Context> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Disciplines</PageTitle>
 
-<h1>Index</h1>
+<h1>Количество дисциплин: @context.Disciplines.Count()</h1>
 
 <p>
     <a href="disciplines/create">Create New</a>
 </p>
 
 <QuickGrid Class="table" Items="context.Disciplines">
+    <PropertyColumn Property="discipline => discipline.discipline_id" />
     <PropertyColumn Property="discipline => discipline.discipline_name" />
     <PropertyColumn Property="discipline => discipline.number_of_lessons" />
 
     <TemplateColumn Context="discipline">
-        <a href="@($"disciplines/edit?discipline_id={discipline.discipline_id}")">Edit</a> |
         <a href="@($"disciplines/details?discipline_id={discipline.discipline_id}")">Details</a> |
+        <a href="@($"disciplines/edit?discipline_id={discipline.discipline_id}")">Edit</a> |
         <a href="@($"disciplines/delete?discipline_id={discipline.discipline_id}")">Delete</a>
     </TemplateColumn>
 </QuickGrid>

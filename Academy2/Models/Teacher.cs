@@ -8,11 +8,12 @@ namespace Academy2.Models
         [Key]
         [Column(TypeName = "smallint")]
         public int teacher_id { get; set; }
-        public DateOnly? work_since { get; set; } 
-        [Column(TypeName = "smallmoney")]
+        public DateOnly? work_since { get; set; } = default!;
+        //[Column(TypeName = "smallmoney")]
         public decimal rate { get; set; }
 
         //Nav.properties
-        ICollection<TeacherDisciplineRelation> DisciplinesRelations { get; set; } = default!;
+        public ICollection<TeacherDisciplineRelation> DisciplinesRelations { get; set; } = default!;
+        
     }
 }

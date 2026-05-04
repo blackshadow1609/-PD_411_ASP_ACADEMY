@@ -73,6 +73,15 @@
             <a href="@($"/teachers/edit?teacher_id={teacher.teacher_id}")">Edit</a> |
             <a href="/teachers">Back to List</a>
         </div>
+        <div>
+            <h4>Количество дисциплин: @teacher.DisciplinesRelations.Count</h4>
+            <ul>
+                @foreach (TeacherDisciplineRelation tr in teacher.DisciplinesRelations)
+                {
+                    <li>@tr.Discipline.discipline_name</li>
+                }
+            </ul>
+        </div>
     }
 </div>
 
@@ -85,7 +94,11 @@
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        teacher = await context.Teachers.FirstOrDefaultAsync(m => m.teacher_id == teacher_id);
+        teacher = await context
+        .Teachers
+        .Include(teacher => teacher.DisciplinesRelations)
+        .ThenInclude(tr => tr.Discipline)
+        .FirstOrDefaultAsync(m => m.teacher_id == teacher_id);
 
         if (teacher is null)
         {
