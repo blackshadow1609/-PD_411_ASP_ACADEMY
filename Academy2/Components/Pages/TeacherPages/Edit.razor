@@ -100,8 +100,8 @@ else
     [SupplyParameterFromForm]
     private Teacher? Teacher { get; set; }
 
-    DbSet<Discipline>? Disciplines { get; set; }
-    DbSet<TeacherDisciplineRelation>? TDR { get; set; }
+    ICollection <Discipline>? Disciplines { get; set; }
+    ICollection <TeacherDisciplineRelation>? TDR { get; set; }
 
     int discipline;
 
@@ -128,8 +128,8 @@ else
         Teacher ??= await context.Teachers.FirstOrDefaultAsync(m => m.teacher_id == teacher_id);
 
 
-        Disciplines = context.Disciplines;
-        TDR = context.TeachersDisciplinesRelation;
+        Disciplines = await context.Disciplines.ToListAsync();
+        TDR = await context.TeachersDisciplinesRelation.ToListAsync();
 
         if (Teacher?.photo != null && Teacher.photo.Length > 0)
         {
