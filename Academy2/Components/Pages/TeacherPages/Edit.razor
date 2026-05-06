@@ -88,7 +88,7 @@ else
                         </InputSelect>
                         <button type="button" @onclick="AddDiscipline">Добавить</button>
                         <ul>
-                            @foreach (TeacherDisciplineRelation tdr in NewDisciplines)
+                            @foreach (TeacherDisciplineRelation tdr in NewDisciplines) 
                             {
                                 <li>
                                     @tdr.Discipline.discipline_name
