@@ -76,34 +76,71 @@ else
                         <InputFile OnChange="LoadPhoto" />
                     </div>
                     <div class="mb-3">
-                        @* <div class="mb-3" style="align-content:center;"> *@
-
                         <h5>Выберите дисциплину:</h5>
-
-                        <InputSelect @bind-Value="discipline" class="form-control">
+                        
+                        <InputSelect @bind-Value="SelectedDisciplineId" class="form-control">
+                            <option value="">-- Выберите дисциплину --</option>
                             @foreach (Discipline d in Disciplines)
                             {
                                 <option value="@d.discipline_id">@d.discipline_name</option>
                             }
                         </InputSelect>
-                        <button type="button" @onclick="AddDiscipline">Добавить</button>
-                        <ul>
-                            @foreach (TeacherDisciplineRelation tdr in NewDisciplines)
-                            {
-                                <li>
-                                    @tdr.Discipline.discipline_name
-                                </li>
-                            }
-                        </ul>
+                        
+                        <button type="button" class="btn btn-secondary mt-2" @onclick="AddDiscipline" disabled="@(SelectedDisciplineId == 0)">
+                            Добавить дисциплину
+                        </button>
+                        
                         <hr />
-                        <ul>
-                            @foreach (TeacherDisciplineRelation tdr in TDR)
-                            {
-                                <li>
-                                    @tdr.Discipline.discipline_name
-                                </li>
-                            }
-                        </ul>
+                        
+                        <h5>Новые дисциплины:</h5>
+                        @if (NewDisciplines.Any())
+                        {
+                            <ul>
+                                @foreach (var tdr in NewDisciplines)
+                                {
+                                    <li>
+                                        @tdr.Discipline?.discipline_name
+                                        <button type="button" class="btn btn-sm btn-danger ms-2" @onclick="() => RemoveNewDiscipline(tdr)">Удалить</button>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p>Нет добавленных дисциплин</p>
+                        }
+                        
+                        <hr />
+                        
+                        <h5>Существующие дисциплины:</h5>
+                        @if (OriginalDisciplines.Any())
+                        {
+                            <ul>
+                                @foreach (var tdr in OriginalDisciplines)
+                                {
+                                    <li>
+                                        @tdr.Discipline?.discipline_name
+                                        <button type="button" class="btn btn-sm btn-danger ms-2" @onclick="() => MarkForDeletion(tdr)">Удалить</button>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p>Нет привязанных дисциплин</p>
+                        }
+                        
+                        @if (DisciplinesToDelete.Any())
+                        {
+                            <hr />
+                            <h5>Будут удалены:</h5>
+                            <ul class="text-danger">
+                                @foreach (var tdr in DisciplinesToDelete)
+                                {
+                                    <li>@tdr.Discipline?.discipline_name</li>
+                                }
+                            </ul>
+                        }
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
@@ -117,23 +154,21 @@ else
 </div>
 
 @code {
-
     [SupplyParameterFromQuery]
     private int teacher_id { get; set; }
 
     [SupplyParameterFromForm]
     private Teacher? Teacher { get; set; }
 
-    ICollection<Discipline>? Disciplines { get; set; }
-    ICollection<TeacherDisciplineRelation>? TDR { get; set; }
-    List<TeacherDisciplineRelation> NewDisciplines = new List<TeacherDisciplineRelation>();
+    private ICollection<Discipline>? Disciplines { get; set; }
+    private List<TeacherDisciplineRelation> OriginalDisciplines { get; set; } = new();
+    private List<TeacherDisciplineRelation> NewDisciplines { get; set; } = new();
+    private List<TeacherDisciplineRelation> DisciplinesToDelete { get; set; } = new();
+    
+    private int SelectedDisciplineId { get; set; }
+    private string? url { get; set; }
 
-    int discipline;
-
-
-    string? url { get; set; }
-
-    async Task LoadPhoto(InputFileChangeEventArgs e)
+    private async Task LoadPhoto(InputFileChangeEventArgs e)
     {
         var file = e.File;
         if (file != null)
@@ -148,40 +183,103 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-
         using var context = DbFactory.CreateDbContext();
-        Teacher ??= await context.Teachers.FirstOrDefaultAsync(m => m.teacher_id == teacher_id);
-
-        Disciplines = await context.Disciplines.ToListAsync();
-        TDR = await context.TeachersDisciplinesRelation.Where(t => t.teacher == teacher_id).ToListAsync();
-
-
-        if (Teacher?.photo != null && Teacher.photo.Length > 0)
-        {
-            url = $"data:image/jpeg;base64,{Convert.ToBase64String(Teacher.photo)}";
-        }
+        
+        Teacher ??= await context.Teachers
+            .FirstOrDefaultAsync(m => m.teacher_id == teacher_id);
 
         if (Teacher is null)
         {
             NavigationManager.NotFound();
+            return;
+        }
+
+        Disciplines = await context.Disciplines.ToListAsync();
+       
+        OriginalDisciplines = await context.TeachersDisciplinesRelation
+            .Include(tdr => tdr.Discipline)
+            .Where(tdr => tdr.teacher == teacher_id)
+            .ToListAsync();
+
+        if (Teacher.photo != null && Teacher.photo.Length > 0)
+        {
+            url = $"data:image/jpeg;base64,{Convert.ToBase64String(Teacher.photo)}";
         }
     }
 
-    void AddDiscipline()
+    private void AddDiscipline()
     {
-        TeacherDisciplineRelation newRelation =
-        new TeacherDisciplineRelation { teacher = teacher_id, discipline = discipline };
-        newRelation.Teacher = Teacher;
-        newRelation.Discipline = Disciplines.Where(d => d.discipline_id == discipline).First();
-        /* if (NewDisciplines.Contains(newRelation)) */
-        NewDisciplines.Add(newRelation);
+        if (SelectedDisciplineId == 0) return;
+        
+        if (NewDisciplines.Any(d => d.discipline == SelectedDisciplineId))
+        {
+            return;
+        }
+        
+        if (OriginalDisciplines.Any(d => d.discipline == SelectedDisciplineId))
+        {
+            return;
+        }
+        
+        var discipline = Disciplines?.FirstOrDefault(d => d.discipline_id == SelectedDisciplineId);
+        if (discipline != null)
+        {
+            var newRelation = new TeacherDisciplineRelation
+            {
+                teacher = teacher_id,
+                discipline = SelectedDisciplineId,
+                Teacher = Teacher,
+                Discipline = discipline
+            };
+            
+            NewDisciplines.Add(newRelation);
+            SelectedDisciplineId = 0; 
+        }
+    }
+    
+    private void RemoveNewDiscipline(TeacherDisciplineRelation tdr)
+    {
+        NewDisciplines.Remove(tdr);
+    }
+    
+    private void MarkForDeletion(TeacherDisciplineRelation tdr)
+    {
+        if (DisciplinesToDelete.Contains(tdr))
+        {
+            DisciplinesToDelete.Remove(tdr);
+        }
+        else
+        {
+            DisciplinesToDelete.Add(tdr);
+        }
     }
 
     private async Task UpdateTeacher()
     {
-       
         using var context = DbFactory.CreateDbContext();
+       
         context.Attach(Teacher!).State = EntityState.Modified;
+
+        foreach (var tdr in DisciplinesToDelete)
+        {
+            var relationToDelete = await context.TeachersDisciplinesRelation
+                .FirstOrDefaultAsync(r => r.teacher == tdr.teacher && r.discipline == tdr.discipline);
+            
+            if (relationToDelete != null)
+            {
+                context.TeachersDisciplinesRelation.Remove(relationToDelete);
+            }
+        }
+        
+        foreach (var newRelation in NewDisciplines)
+        {
+            var relation = new TeacherDisciplineRelation
+            {
+                teacher = teacher_id,
+                discipline = newRelation.discipline
+            };
+            context.TeachersDisciplinesRelation.Add(relation);
+        }
 
         try
         {
@@ -189,7 +287,7 @@ else
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!TeacherExists(Teacher!.teacher_id))
+            if (!await TeacherExists(Teacher!.teacher_id))
             {
                 NavigationManager.NotFound();
             }
@@ -202,10 +300,9 @@ else
         NavigationManager.NavigateTo("/teachers");
     }
 
-    private bool TeacherExists(int teacher_id)
+    private async Task<bool> TeacherExists(int teacherId)
     {
-        
         using var context = DbFactory.CreateDbContext();
-        return context.Teachers.Any(e => e.teacher_id == teacher_id);
+        return await context.Teachers.AnyAsync(e => e.teacher_id == teacherId);
     }
 }
